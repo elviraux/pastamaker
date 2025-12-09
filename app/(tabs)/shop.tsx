@@ -6,8 +6,10 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  Pressable,
 } from "react-native";
 import { SlidersHorizontal } from "lucide-react-native";
+import { router } from "expo-router";
 import { products, Product } from "@/data/products";
 
 const COLORS = {
@@ -23,8 +25,22 @@ interface ProductItemProps {
 }
 
 function ProductItem({ product }: ProductItemProps) {
+  const handlePress = () => {
+    router.push(`/product/${product.id}`);
+  };
+
+  const handleAddToCart = () => {
+    // Handle add to cart logic here
+  };
+
   return (
-    <View style={styles.productItem}>
+    <Pressable
+      style={({ pressed }) => [
+        styles.productItem,
+        pressed && styles.productItemPressed,
+      ]}
+      onPress={handlePress}
+    >
       <View style={styles.productImageContainer}>
         <Image
           source={{ uri: product.image }}
@@ -36,10 +52,14 @@ function ProductItem({ product }: ProductItemProps) {
         {product.name}
       </Text>
       <Text style={styles.productPrice}>${product.price.toFixed(2)}</Text>
-      <TouchableOpacity style={styles.addToCartButton}>
+      <TouchableOpacity
+        style={styles.addToCartButton}
+        onPress={handleAddToCart}
+        activeOpacity={0.8}
+      >
         <Text style={styles.addToCartText}>Add to Cart</Text>
       </TouchableOpacity>
-    </View>
+    </Pressable>
   );
 }
 
@@ -114,6 +134,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     overflow: "hidden",
+  },
+  productItemPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
   },
   productImageContainer: {
     width: "100%",

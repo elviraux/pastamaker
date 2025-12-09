@@ -7,9 +7,11 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  Pressable,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Plus } from "lucide-react-native";
+import { router } from "expo-router";
 import { getNewestProducts, Product } from "@/data/products";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -33,8 +35,23 @@ interface ProductCardProps {
 }
 
 function ProductCard({ product }: ProductCardProps) {
+  const handlePress = () => {
+    router.push(`/product/${product.id}`);
+  };
+
+  const handleAddPress = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    // Handle add to cart logic here
+  };
+
   return (
-    <View style={styles.productCard}>
+    <Pressable
+      style={({ pressed }) => [
+        styles.productCard,
+        pressed && styles.productCardPressed,
+      ]}
+      onPress={handlePress}
+    >
       <View style={styles.productImageContainer}>
         <Image
           source={{ uri: product.image }}
@@ -48,16 +65,24 @@ function ProductCard({ product }: ProductCardProps) {
         </Text>
         <View style={styles.productPriceRow}>
           <Text style={styles.productPrice}>${product.price.toFixed(2)}</Text>
-          <TouchableOpacity style={styles.addButton}>
+          <TouchableOpacity style={styles.addButton} onPress={handleAddPress}>
             <Plus size={16} color={COLORS.textMuted} />
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
 function HeroSection() {
+  const handleShopPress = () => {
+    router.push("/(tabs)/shop");
+  };
+
+  const handleBlogPress = () => {
+    router.push("/(tabs)/blog");
+  };
+
   return (
     <View style={styles.heroContainer}>
       <Image
@@ -78,10 +103,10 @@ function HeroSection() {
           Filled with real metal - magnetic steel & iron - polish or patina
         </Text>
         <View style={styles.heroButtons}>
-          <TouchableOpacity style={styles.primaryButton}>
+          <TouchableOpacity style={styles.primaryButton} onPress={handleShopPress}>
             <Text style={styles.primaryButtonText}>Shop Metal Filament</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.secondaryButton}>
+          <TouchableOpacity style={styles.secondaryButton} onPress={handleBlogPress}>
             <Text style={styles.secondaryButtonText}>Metal finishing blog</Text>
           </TouchableOpacity>
         </View>
@@ -226,6 +251,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 1,
     borderColor: COLORS.border,
+  },
+  productCardPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
   },
   productImageContainer: {
     width: "100%",

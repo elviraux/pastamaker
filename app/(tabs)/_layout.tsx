@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Tabs, router } from "expo-router";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -10,6 +10,7 @@ import {
   Search,
   ShoppingCart,
 } from "lucide-react-native";
+import { useCart } from "@/context/CartContext";
 
 const COLORS = {
   primary: "#108474",
@@ -21,6 +22,12 @@ const COLORS = {
 
 function CustomHeader() {
   const insets = useSafeAreaInsets();
+  const { getItemCount } = useCart();
+  const itemCount = getItemCount();
+
+  const handleCartPress = () => {
+    router.push("/cart");
+  };
 
   return (
     <View style={[styles.headerContainer, { paddingTop: insets.top }]}>
@@ -36,11 +43,15 @@ function CustomHeader() {
           <Text style={styles.logoText}>Protopasta</Text>
         </View>
 
-        <TouchableOpacity style={styles.headerButton}>
+        <TouchableOpacity style={styles.headerButton} onPress={handleCartPress}>
           <ShoppingCart size={24} color={COLORS.text} />
-          <View style={styles.cartBadge}>
-            <Text style={styles.cartBadgeText}>0</Text>
-          </View>
+          {itemCount > 0 && (
+            <View style={styles.cartBadge}>
+              <Text style={styles.cartBadgeText}>
+                {itemCount > 99 ? "99+" : itemCount}
+              </Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </View>

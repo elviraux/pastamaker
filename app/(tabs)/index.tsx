@@ -13,6 +13,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Plus } from "lucide-react-native";
 import { router } from "expo-router";
 import { getNewestProducts, Product } from "@/data/products";
+import { useCart } from "@/context/CartContext";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2.3;
@@ -32,16 +33,17 @@ const COLORS = {
 
 interface ProductCardProps {
   product: Product;
+  onAddToCart: (product: Product) => void;
 }
 
-function ProductCard({ product }: ProductCardProps) {
+function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const handlePress = () => {
     router.push(`/product/${product.id}`);
   };
 
   const handleAddPress = (e: { stopPropagation: () => void }) => {
     e.stopPropagation();
-    // Handle add to cart logic here
+    onAddToCart(product);
   };
 
   return (
@@ -115,7 +117,11 @@ function HeroSection() {
   );
 }
 
-function NewestProductsSection() {
+interface NewestProductsSectionProps {
+  onAddToCart: (product: Product) => void;
+}
+
+function NewestProductsSection({ onAddToCart }: NewestProductsSectionProps) {
   const newestProducts = getNewestProducts();
 
   return (
@@ -127,7 +133,7 @@ function NewestProductsSection() {
         contentContainerStyle={styles.productsScroll}
       >
         {newestProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
         ))}
       </ScrollView>
     </View>
@@ -135,6 +141,17 @@ function NewestProductsSection() {
 }
 
 export default function HomeScreen() {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+    });
+  };
+
   return (
     <ScrollView
       style={styles.container}
@@ -142,7 +159,7 @@ export default function HomeScreen() {
       showsVerticalScrollIndicator={false}
     >
       <HeroSection />
-      <NewestProductsSection />
+      <NewestProductsSection onAddToCart={handleAddToCart} />
     </ScrollView>
   );
 }

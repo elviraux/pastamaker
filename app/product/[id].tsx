@@ -22,6 +22,7 @@ import {
   Star,
 } from "lucide-react-native";
 import { getProductById, Product } from "@/data/products";
+import { useCart } from "@/context/CartContext";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -293,8 +294,29 @@ export default function ProductDetailScreen() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<TabType>("description");
+  const { addToCart, getItemCount } = useCart();
 
   const product = getProductById(id || "");
+  const itemCount = getItemCount();
+
+  const handleCartPress = () => {
+    router.push("/cart");
+  };
+
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+        },
+        quantity
+      );
+      setQuantity(1); // Reset quantity after adding
+    }
+  };
 
   if (!product) {
     return (
@@ -337,11 +359,15 @@ export default function ProductDetailScreen() {
           <TouchableOpacity style={styles.headerButton}>
             <Search size={22} color={COLORS.text} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerButton}>
+          <TouchableOpacity style={styles.headerButton} onPress={handleCartPress}>
             <ShoppingCart size={22} color={COLORS.text} />
-            <View style={styles.cartBadge}>
-              <Text style={styles.cartBadgeText}>0</Text>
-            </View>
+            {itemCount > 0 && (
+              <View style={styles.cartBadge}>
+                <Text style={styles.cartBadgeText}>
+                  {itemCount > 99 ? "99+" : itemCount}
+                </Text>
+              </View>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -379,7 +405,7 @@ export default function ProductDetailScreen() {
               onDecrease={handleDecrease}
               onIncrease={handleIncrease}
             />
-            <TouchableOpacity style={styles.inlineAddButton}>
+            <TouchableOpacity style={styles.inlineAddButton} onPress={handleAddToCart}>
               <Text style={styles.inlineAddButtonText}>Add to Cart</Text>
             </TouchableOpacity>
           </View>
@@ -437,7 +463,7 @@ export default function ProductDetailScreen() {
 
       {/* Sticky Footer */}
       <View style={[styles.stickyFooter, { paddingBottom: insets.bottom + 16 }]}>
-        <TouchableOpacity style={styles.addToCartButton}>
+        <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
           <Text style={styles.addToCartText}>Add to Cart</Text>
         </TouchableOpacity>
       </View>

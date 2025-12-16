@@ -11,6 +11,7 @@ import {
 import { SlidersHorizontal } from "lucide-react-native";
 import { router } from "expo-router";
 import { products, Product } from "@/data/products";
+import { useCart } from "@/context/CartContext";
 
 const COLORS = {
   primary: "#108474",
@@ -22,15 +23,17 @@ const COLORS = {
 
 interface ProductItemProps {
   product: Product;
+  onAddToCart: (product: Product) => void;
 }
 
-function ProductItem({ product }: ProductItemProps) {
+function ProductItem({ product, onAddToCart }: ProductItemProps) {
   const handlePress = () => {
     router.push(`/product/${product.id}`);
   };
 
-  const handleAddToCart = () => {
-    // Handle add to cart logic here
+  const handleAddToCart = (e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+    onAddToCart(product);
   };
 
   return (
@@ -64,6 +67,17 @@ function ProductItem({ product }: ProductItemProps) {
 }
 
 export default function ShopScreen() {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (product: Product) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.filterBar}>
@@ -80,7 +94,9 @@ export default function ShopScreen() {
         numColumns={2}
         contentContainerStyle={styles.productList}
         columnWrapperStyle={styles.productRow}
-        renderItem={({ item }) => <ProductItem product={item} />}
+        renderItem={({ item }) => (
+          <ProductItem product={item} onAddToCart={handleAddToCart} />
+        )}
         showsVerticalScrollIndicator={false}
       />
     </View>

@@ -26,6 +26,23 @@ export default function RootLayout() {
               animation: "slide_from_bottom",
             }}
           />
+          <Stack.Screen
+            name="checkout"
+            options={{
+              headerShown: false,
+              presentation: "card",
+              animation: "slide_from_right",
+            }}
+          />
+          <Stack.Screen
+            name="order-success"
+            options={{
+              headerShown: false,
+              presentation: "card",
+              animation: "fade",
+              gestureEnabled: false,
+            }}
+          />
         </Stack>
       </CartProvider>
     </SafeAreaProvider>

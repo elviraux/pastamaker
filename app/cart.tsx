@@ -104,11 +104,7 @@ export default function CartScreen() {
   const subtotal = getSubtotal();
 
   const handleCheckout = () => {
-    Alert.alert(
-      "Checkout",
-      "Checkout functionality is not yet implemented.",
-      [{ text: "OK" }]
-    );
+    router.push("/checkout");
   };
 
   const handleClearCart = () => {
